@@ -1,18 +1,13 @@
 import { useEffect, useState } from "react";
+import listings from "./data/etsy.json"; // ✅ Импорт как модуля
 import Listing from "./components/Listing";
 
 const App = () => {
   const [items, setItems] = useState<any[]>([]);
 
   useEffect(() => {
-    const url = `data/etsy.json`;
-    fetch(url)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data) => setItems(data))
-      .catch((err) => console.error("Ошибка загрузки:", err));
+    // Просто передаём импортированные данные
+    setItems(listings);
   }, []);
 
   return (
