@@ -5,7 +5,7 @@ const App = () => {
   const [items, setItems] = useState<any[]>([]);
 
   useEffect(() => {
-    const url = `/etsy.json`;
+    const url = `/data/etsy.json`;
     fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
