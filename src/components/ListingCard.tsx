@@ -1,65 +1,50 @@
+import type { ListingItem } from "../types";
 
-interface Listing {
-  listing_id?: number;
-  url?: string;
-  MainImage?: {
-    url_570xN?: string;
-  };
-  title?: string;
-  currency_code?: string;
-  price?: string;
-  quantity?: number;
-}
+const ListingCard = ({ item }: { item: ListingItem }) => {
+  // Обрезка названия до 50 символов
+  const title =
+    item.title.length > 50 ? item.title.slice(0, 47) + "..." : item.title;
 
-const ListingCard = ({ item }: { item: Listing }) => {
-  const titleText = (item.title || "").trim();
-  const displayTitle =
-    titleText.length > 50 ? titleText.slice(0, 47) + "..." : titleText;
-
-  const imageUrl =
-    item.MainImage?.url_570xN ||
-    item.MainImage?.["url_570xN"] || 
-    "https://via.placeholder.com/260x240?text=No+Image";
-
+  // Форматирование цены
   const formatPrice = (): string => {
-    const rawPrice = item.price?.trim() || "0";
-    const numPrice = parseFloat(rawPrice);
-    const priceStr = isNaN(numPrice) ? rawPrice : numPrice.toFixed(2);
+    const numPrice = parseFloat(item.price);
+    const formatted = isNaN(numPrice) ? item.price : numPrice.toFixed(2);
+    const code = item.currency_code.trim().toUpperCase();
 
-    const currency = (item.currency_code || "").trim();
-    switch (currency) {
+    switch (code) {
       case "USD":
-        return `$${priceStr}`;
+        return `$${formatted}`;
       case "EUR":
-        return `€${priceStr}`;
+        return `€${formatted}`;
       case "GBP":
-        return `£${priceStr}`;
+        return `£${formatted}`;
       default:
-        return `${currency} ${priceStr}`;
+        return `${code} ${formatted}`;
     }
   };
 
-  const quantity = item.quantity ?? 0;
-  let stockClass = "stock-high";
-  if (quantity <= 10) {
-    stockClass = "stock-low";
-  } else if (quantity <= 20) {
-    stockClass = "stock-medium";
-  }
+  // Класс для остатка
+  const getStockClass = (): string => {
+    const qty = item.quantity;
+    if (qty <= 10) return "stock-low";
+    if (qty <= 20) return "stock-medium";
+    return "stock-high";
+  };
+
+  // URL изображения с fallback
+  const imageUrl = item.MainImage.url_570xN || "/no-image.png";
 
   return (
     <div className="product-card">
       <a href={item.url} target="_blank" rel="noopener noreferrer">
-        <img
-          src={imageUrl}
-          alt={displayTitle || "Product"}
-          className="product-image"
-        />
+        <img src={imageUrl} alt={title} className="product-image" />
         <div className="product-info">
-          <h3 className="product-title">{displayTitle || "No title"}</h3>
+          <h3 className="product-title">{title}</h3>
           <div className="price-container">
             <div className="product-price">{formatPrice()}</div>
-            <span className={`stock-badge ${stockClass}`}>{quantity} left</span>
+            <span className={`stock-badge ${getStockClass()}`}>
+              {item.quantity} left
+            </span>
           </div>
         </div>
       </a>
